@@ -17,6 +17,8 @@ dependencies = [
     "tenacity>=8.0.0",
     "rich>=13.0.0",
     "openai>=1.0.0",
+    "flask>=3.0.0",
+    "waitress>=3.0.0",
 ]
 
 [project.optional-dependencies]
@@ -50,6 +52,9 @@ select = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["myaiproject"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/myaiproject/webapp.py" = ["E501"]  # inline CSS/JS in raw strings
 
 [tool.mypy]
 strict = true

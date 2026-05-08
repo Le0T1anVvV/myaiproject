@@ -19,8 +19,16 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     _add_scrape_parser(subparsers)
+    _add_web_parser(subparsers)
     args = parser.parse_args()
-    asyncio.run(_handle_scrape(args))
+    _dispatch(args)
+
+
+def _dispatch(args: argparse.Namespace) -> None:
+    if args.command == "scrape":
+        asyncio.run(_handle_scrape(args))
+    elif args.command == "web":
+        _handle_web(args)
 
 
 def _add_scrape_parser(
@@ -86,6 +94,43 @@ async def _handle_scrape(args: argparse.Namespace) -> None:
     print(f"Scraped {len(pages)} page(s). Output written to:")
     for p in paths:
         print(f"  {p}")
+
+
+def _add_web_parser(
+    subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
+) -> None:
+    web = subparsers.add_parser("web", help="Start the web UI server")
+    web.add_argument(
+        "--port", type=int, default=0,
+        help="Server port (default: 5000 dev, $PORT in production)"
+    )
+    web.add_argument(
+        "--host", default="127.0.0.1",
+        help="Server host (default: 127.0.0.1, 0.0.0.0 in production)"
+    )
+    web.add_argument(
+        "--production", action="store_true", default=False,
+        help="Run with waitress WSGI server for production"
+    )
+
+
+def _handle_web(args: argparse.Namespace) -> None:
+    import os
+
+    from myaiproject.webapp import create_app
+
+    if args.production:
+        from waitress import serve
+
+        port = args.port or int(os.getenv("PORT", "5000"))
+        host = "0.0.0.0"
+        print(f"\n  Production server on http://0.0.0.0:{port}\n")
+        serve(create_app(debug=False), host=host, port=port)
+    else:
+        port = args.port or 5000
+        app = create_app(debug=True)
+        print(f"\n  Web UI: http://{args.host}:{port}\n")
+        app.run(host=args.host, port=port, debug=True)
 
 
 if __name__ == "__main__":
