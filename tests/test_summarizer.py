@@ -66,14 +66,14 @@ def test_summarizer_truncates_long_text(summarizer_config):
         mock_client.chat.completions.create.return_value = mock_completion
         mock_openai.return_value = mock_client
 
-        long_text = "x" * 5000
+        long_text = "x" * 6000
         summarizer = DeepSeekSummarizer(summarizer_config)
         summarizer.summarize(long_text)
 
         call_args = mock_client.chat.completions.create.call_args
         sent_text = call_args[1]["messages"][0]["content"]
         assert len(sent_text) < len(long_text)
-        assert len(sent_text) <= 3000 + 100  # prompt + truncated text
+        assert len(sent_text) <= 5000 + 100  # prompt + truncated text
 
 
 def test_config_is_ready():

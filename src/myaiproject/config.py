@@ -22,7 +22,7 @@ class SummarizerConfig:
     )
     base_url: str = "https://api.deepseek.com"
     model: str = "deepseek-chat"
-    max_tokens: int = 100
+    max_tokens: int = 200
     enabled: bool = False
 
     @property

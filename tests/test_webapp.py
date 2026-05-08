@@ -39,6 +39,9 @@ def test_api_scrape_requires_url(client):
     data = resp.get_json()
     assert "URL" in data["error"]
 
+    resp2 = client.post("/api/scrape", json={"urls": []})
+    assert resp2.status_code == 400
+
 
 def test_api_scrape_succeeds(client, httpx_mock: HTTPXMock):
     url = "https://example.com"
@@ -47,22 +50,24 @@ def test_api_scrape_succeeds(client, httpx_mock: HTTPXMock):
         text="<html><head><title>Test</title></head><body><p>Hello</p></body></html>",
     )
 
-    resp = client.post("/api/scrape", json={"url": url})
+    resp = client.post("/api/scrape", json={"urls": [url]})
     assert resp.status_code == 200
     data = resp.get_json()
-    assert data["title"] == "Test"
-    assert data["links"] == 0
-    assert data["images"] == 0
+    page = data["pages"][0]
+    assert page["title"] == "Test"
+    assert page["links"] == 0
+    assert page["images"] == 0
 
 
 def test_api_scrape_handles_bad_url(client, httpx_mock: HTTPXMock):
     url = "https://bad.example"
     httpx_mock.add_exception(url=url, exception=Exception("Connection failed"))
 
-    resp = client.post("/api/scrape", json={"url": url})
-    assert resp.status_code == 500
+    resp = client.post("/api/scrape", json={"urls": [url]})
+    # Engine returns page with error text, not a 500
+    assert resp.status_code == 200
     data = resp.get_json()
-    assert "Error" in data["error"]
+    assert "Error" in data["pages"][0]["text"]
 
 
 def test_api_scrape_returns_summary_when_enabled(
@@ -81,7 +86,7 @@ def test_api_scrape_returns_summary_when_enabled(
     )
 
     with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "sk-test"}):
-        resp = client.post("/api/scrape", json={"url": url})
+        resp = client.post("/api/scrape", json={"urls": [url]})
     assert resp.status_code == 200
     data = resp.get_json()
-    assert data["summary"] == "a summary"
+    assert data["pages"][0]["summary"] == "a summary"

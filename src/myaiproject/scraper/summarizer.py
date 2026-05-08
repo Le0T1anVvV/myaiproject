@@ -10,8 +10,8 @@ from myaiproject.config import SummarizerConfig
 
 logger = logging.getLogger(__name__)
 
-_SUMMARIZE_PROMPT = "请用50字以内总结以下内容的核心要点："
-_MAX_INPUT_CHARS = 3000
+_SUMMARIZE_PROMPT = "请用100字左右总结以下内容的核心要点："
+_MAX_INPUT_CHARS = 5000
 
 
 class DeepSeekSummarizer:
