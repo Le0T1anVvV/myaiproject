@@ -2,7 +2,7 @@ services:
   - type: web
     name: myaiproject
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && pip install .
     startCommand: python -m myaiproject web --production
     envVars:
       - key: DEEPSEEK_API_KEY

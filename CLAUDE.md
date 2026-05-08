@@ -79,7 +79,7 @@ This project is configured for one-click deployment to Render.com:
 2. Sign up at [render.com](https://render.com) → "New Web Service" → connect the GitHub repo
 3. Render auto-detects `render.yaml` and configures the service
 4. In the Render Dashboard → Environment, add `DEEPSEEK_API_KEY` with your API key
-5. Public URL will be `https://myaiproject.onrender.com`
+5. Public URL will be `https://my-deepseek-app.onrender.com`
 
 Local production test with Waitress:
 
@@ -89,7 +89,7 @@ python -m myaiproject web --production
 
 The `render.yaml` file specifies:
 - Runtime: Python 3.12.10
-- Build: `pip install -r requirements.txt`
+- Build: `pip install -r requirements.txt && pip install .`
 - Start: `python -m myaiproject web --production`
 - `DEEPSEEK_API_KEY` set via Render environment variables (not in repo)
 
